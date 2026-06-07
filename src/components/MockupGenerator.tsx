@@ -109,6 +109,10 @@ export function MockupGenerator() {
 
   async function generate() {
     if (!product || !label) return;
+    // When the seed is locked, reuse the previous render as a reference so the
+    // model keeps the exact same composition/size and only changes the chosen
+    // parameter (lighting, camera, etc.).
+    const referenceImage = seedOn ? result : null;
     setLoading(true);
     setError(null);
     setResult(null);
@@ -131,6 +135,7 @@ export function MockupGenerator() {
           format,
           camera,
           seed: seedOn ? seed : undefined,
+          referenceImage: referenceImage ?? undefined,
         }),
       });
       const data = (await res.json()) as { image?: string; error?: string };

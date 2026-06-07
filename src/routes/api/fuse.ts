@@ -9,6 +9,7 @@ interface FuseBody {
   format?: string;
   camera?: string;
   seed?: number;
+  referenceImage?: string; // previous render, used to lock consistency
 }
 
 function isDataUrl(value: unknown): value is string {
@@ -62,6 +63,7 @@ export const Route = createFileRoute("/api/fuse")({
         }
 
         const hasBackground = isDataUrl(body.backgroundImage);
+        const hasReference = isDataUrl(body.referenceImage);
         const userPrompt = (body.prompt ?? "").toString().slice(0, 600).trim();
         const lighting = LIGHTING_MAP[body.lighting ?? ""] ?? "";
         const format = FORMAT_MAP[body.format ?? ""] ?? "";
@@ -71,22 +73,49 @@ export const Route = createFileRoute("/api/fuse")({
             ? Math.floor(body.seed)
             : undefined;
 
+        // Order images so positions match the textual instruction below.
+        const imageOrder = hasReference ? "reference" : "fresh";
+
         const instruction = [
           "You are a professional product mockup generator.",
-          hasBackground
-            ? "The FIRST image is a product, the SECOND image is a label/design artwork, the THIRD image is a background scene."
-            : "The FIRST image is a product. The SECOND image is a label/design artwork.",
+          imageOrder === "reference"
+            ? "The FIRST image is the PREVIOUS final render you must stay consistent with."
+            : "",
+          imageOrder === "reference"
+            ? hasBackground
+              ? "The SECOND image is a product, the THIRD image is a label/design artwork, the FOURTH image is a background scene."
+              : "The SECOND image is a product. The THIRD image is a label/design artwork."
+            : hasBackground
+              ? "The FIRST image is a product, the SECOND image is a label/design artwork, the THIRD image is a background scene."
+              : "The FIRST image is a product. The SECOND image is a label/design artwork.",
           "Apply the label realistically onto the product surface, following its curvature,",
           "perspective, lighting and shadows so it looks like a real photograph of the finished product.",
           hasBackground
             ? "Place the finished product into the provided background scene, matching its lighting and perspective."
             : "Keep the product shape and background clean and photorealistic.",
-          format ? `Render ${format}.` : "",
-          camera ? `Use ${camera}.` : "",
-          lighting ? `Use ${lighting}.` : "",
-          seed !== undefined
-            ? `Keep a consistent look and composition across renders (consistency seed ${seed}).`
-            : "",
+          imageOrder === "reference"
+            ? [
+                "CRITICAL: Reproduce the PREVIOUS render exactly. Keep the identical composition,",
+                "framing, image size and aspect ratio, camera angle, product position and scale,",
+                "background and label placement.",
+                // Only the explicitly chosen parameters below may differ from the previous render.
+                lighting ? `ONLY change the lighting to: ${lighting}.` : "",
+                camera ? `ONLY change the camera to: ${camera}.` : "",
+                format ? `ONLY change the format/aspect ratio to: ${format}.` : "",
+                "Do not change anything else.",
+              ]
+                .filter(Boolean)
+                .join(" ")
+            : [
+                format ? `Render ${format}.` : "",
+                camera ? `Use ${camera}.` : "",
+                lighting ? `Use ${lighting}.` : "",
+                seed !== undefined
+                  ? `Keep a consistent look and composition across renders (consistency seed ${seed}).`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" "),
           "Output only the final image.",
           userPrompt ? `Additional creative direction: ${userPrompt}` : "",
         ]
@@ -95,9 +124,12 @@ export const Route = createFileRoute("/api/fuse")({
 
         const content: Array<Record<string, unknown>> = [
           { type: "text", text: instruction },
-          { type: "image_url", image_url: { url: body.productImage } },
-          { type: "image_url", image_url: { url: body.labelImage } },
         ];
+        if (hasReference) {
+          content.push({ type: "image_url", image_url: { url: body.referenceImage } });
+        }
+        content.push({ type: "image_url", image_url: { url: body.productImage } });
+        content.push({ type: "image_url", image_url: { url: body.labelImage } });
         if (hasBackground) {
           content.push({ type: "image_url", image_url: { url: body.backgroundImage } });
         }
