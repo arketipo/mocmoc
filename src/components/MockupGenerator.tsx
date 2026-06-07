@@ -96,6 +96,7 @@ export function MockupGenerator() {
   const [lighting, setLighting] = useState("");
   const [format, setFormat] = useState("");
   const [camera, setCamera] = useState("");
+  const [model, setModel] = useState("nano-banana-2");
   const [seedOn, setSeedOn] = useState(false);
   const [seed, setSeed] = useState<number | null>(null);
   const [result, setResult] = useState<string | null>(null);
