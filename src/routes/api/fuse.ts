@@ -150,6 +150,75 @@ export const Route = createFileRoute("/api/fuse")({
           content.push({ type: "image_url", image_url: { url: body.backgroundImage } });
         }
 
+        // Preferred path: use the user's own Google Gemini API key (Nano Banana)
+        // when available, so renders bill to their Google account.
+        const geminiModel = GEMINI_MODEL_MAP[body.model ?? ""];
+        if (geminiKey && geminiModel) {
+          const orderedImages: string[] = [];
+          if (hasReference) orderedImages.push(body.referenceImage as string);
+          orderedImages.push(body.productImage, body.labelImage);
+          if (hasBackground) orderedImages.push(body.backgroundImage as string);
+
+          const parts: Array<Record<string, unknown>> = [{ text: instruction }];
+          for (const dataUrl of orderedImages) {
+            const parsed = parseDataUrl(dataUrl);
+            if (parsed) {
+              parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.base64 } });
+            }
+          }
+
+          let gemini: Response;
+          try {
+            gemini = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`,
+              {
+                method: "POST",
+                headers: {
+                  "x-goog-api-key": geminiKey,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ contents: [{ parts }] }),
+              },
+            );
+          } catch {
+            return Response.json({ error: "No se pudo contactar a Gemini." }, { status: 502 });
+          }
+
+          if (!gemini.ok) {
+            const text = await gemini.text().catch(() => "");
+            if (gemini.status === 429) {
+              return Response.json(
+                { error: "Gemini: límite de solicitudes alcanzado. Espera un momento." },
+                { status: 429 },
+              );
+            }
+            if (gemini.status === 401 || gemini.status === 403) {
+              return Response.json(
+                { error: "Tu API key de Gemini no es válida o no tiene permisos." },
+                { status: 401 },
+              );
+            }
+            return Response.json(
+              { error: "Gemini no pudo generar el mockup.", detail: text.slice(0, 300) },
+              { status: 502 },
+            );
+          }
+
+          const gjson = (await gemini.json().catch(() => null)) as Record<string, unknown> | null;
+          const gb64 = extractGeminiImage(gjson);
+          if (!gb64) {
+            return Response.json(
+              { error: "Gemini no devolvió una imagen. Prueba con otras fotos o un prompt distinto." },
+              { status: 502 },
+            );
+          }
+          return Response.json({ image: `data:image/png;base64,${gb64}` });
+        }
+
+        if (!key) {
+          return Response.json({ error: "Falta la configuración de IA." }, { status: 500 });
+        }
+
         let upstream: Response;
         try {
           upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
