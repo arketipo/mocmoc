@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fileToDataUrl } from "@/lib/image-utils";
+import demoMockup from "@/assets/demo-mockup.png.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
@@ -105,11 +106,12 @@ export function MockupGenerator() {
   const [model, setModel] = useState("nano-banana-2");
   const [seedOn, setSeedOn] = useState(false);
   const [seed, setSeed] = useState<number | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canGenerate = !!product && !!label && !loading;
+  const canGenerate = (demoMode || (!!product && !!label)) && !loading;
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
@@ -122,6 +124,17 @@ export function MockupGenerator() {
   }
 
   async function generate() {
+    // Demo mode: show a pre-generated example without spending AI credits.
+    if (demoMode) {
+      setLoading(true);
+      setError(null);
+      setResult(null);
+      // Short delay to simulate the generation experience.
+      await new Promise((r) => setTimeout(r, 900));
+      setResult(demoMockup.url);
+      setLoading(false);
+      return;
+    }
     if (!product || !label) return;
     // When the seed is locked, reuse the previous render as a reference so the
     // model keeps the exact same composition/size and only changes the chosen
