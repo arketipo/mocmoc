@@ -195,14 +195,36 @@ export function MockupGenerator() {
           </span>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <SelectField
-              icon={Sparkles}
-              label="Modelo de IA"
-              placeholder="Elige modelo"
-              value={model}
-              onChange={setModel}
-              options={MODEL_OPTIONS.filter((o) => !o.disabled) as unknown as typeof LIGHTING_OPTIONS}
-            />
+            <div className="flex flex-col gap-1.5">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Modelo de IA
+              </span>
+              <Select value={model} onValueChange={setModel}>
+                <SelectTrigger className="h-9 rounded-lg">
+                  <SelectValue placeholder="Elige modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MODEL_OPTIONS.map((o) => (
+                    <SelectItem
+                      key={o.value}
+                      value={o.value}
+                      disabled={o.disabled}
+                      className={o.disabled ? "opacity-50" : ""}
+                    >
+                      <span className="flex items-center gap-2">
+                        {o.label}
+                        {o.badge && (
+                          <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4">
+                            {o.badge}
+                          </Badge>
+                        )}
+                        {o.disabled && <Lock className="h-3 w-3 text-muted-foreground" />}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
