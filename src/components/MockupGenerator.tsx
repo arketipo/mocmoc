@@ -39,10 +39,15 @@ const FORMAT_OPTIONS = [
 ] as const;
 
 const MODEL_OPTIONS = [
-  { value: "nano-banana-2", label: "Nano Banana 2" },
-  { value: "gemini-3-pro", label: "Gemini 3 Pro" },
+  { value: "nano-banana-2", label: "Nano Banana 2", cost: "Económico" },
+  { value: "gemini-3-pro", label: "Gemini 3 Pro", cost: "Coste alto" },
   { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
 ];
+
+const MODEL_COST_HINT: Record<string, string> = {
+  "nano-banana-2": "Modelo más rápido y económico en créditos.",
+  "gemini-3-pro": "Mayor calidad realista, pero consume más créditos.",
+};
 
 const CAMERA_OPTIONS = [
   { value: "front", label: "Frontal" },
