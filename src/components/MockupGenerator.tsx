@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fileToDataUrl } from "@/lib/image-utils";
+import demoMockup from "@/assets/demo-mockup.png.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
@@ -105,11 +106,12 @@ export function MockupGenerator() {
   const [model, setModel] = useState("nano-banana-2");
   const [seedOn, setSeedOn] = useState(false);
   const [seed, setSeed] = useState<number | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canGenerate = !!product && !!label && !loading;
+  const canGenerate = (demoMode || (!!product && !!label)) && !loading;
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
@@ -122,6 +124,17 @@ export function MockupGenerator() {
   }
 
   async function generate() {
+    // Demo mode: show a pre-generated example without spending AI credits.
+    if (demoMode) {
+      setLoading(true);
+      setError(null);
+      setResult(null);
+      // Short delay to simulate the generation experience.
+      await new Promise((r) => setTimeout(r, 900));
+      setResult(demoMockup.url);
+      setLoading(false);
+      return;
+    }
     if (!product || !label) return;
     // When the seed is locked, reuse the previous render as a reference so the
     // model keeps the exact same composition/size and only changes the chosen
@@ -174,6 +187,15 @@ export function MockupGenerator() {
     <div className="grid gap-8 lg:grid-cols-2">
       {/* Inputs */}
       <div className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+        <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-3 py-2.5">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-foreground">Modo demo</span>
+            <span className="text-xs text-muted-foreground">
+              Muestra un ejemplo prediseñado sin gastar créditos de IA.
+            </span>
+          </div>
+          <Switch checked={demoMode} onCheckedChange={setDemoMode} aria-label="Modo demo" />
+        </div>
         <div className="grid grid-cols-3 gap-3">
           <ImageDropzone
             label="Producto"
@@ -315,7 +337,9 @@ export function MockupGenerator() {
           )}
         </Button>
         <p className="-mt-2 text-center text-xs text-muted-foreground">
-          Arrastra el producto y la etiqueta para empezar.
+          {demoMode
+            ? "Modo demo activo — se mostrará un ejemplo prediseñado."
+            : "Arrastra el producto y la etiqueta para empezar."}
         </p>
 
         {error && (
