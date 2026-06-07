@@ -39,10 +39,15 @@ const FORMAT_OPTIONS = [
 ] as const;
 
 const MODEL_OPTIONS = [
-  { value: "nano-banana-2", label: "Nano Banana 2" },
-  { value: "gemini-3-pro", label: "Gemini 3 Pro" },
+  { value: "nano-banana-2", label: "Nano Banana 2", cost: "Económico" },
+  { value: "gemini-3-pro", label: "Gemini 3 Pro", cost: "Coste alto" },
   { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
 ];
+
+const MODEL_COST_HINT: Record<string, string> = {
+  "nano-banana-2": "Modelo más rápido y económico en créditos.",
+  "gemini-3-pro": "Mayor calidad realista, pero consume más créditos.",
+};
 
 const CAMERA_OPTIONS = [
   { value: "front", label: "Frontal" },
@@ -150,6 +155,11 @@ export function MockupGenerator() {
       });
       const data = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !data.image) {
+        if (res.status === 402) {
+          throw new Error(
+            "Se agotaron los créditos de IA. Añade saldo en Settings → Cloud & AI balance o prueba con Nano Banana 2 (más económico)."
+          );
+        }
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
@@ -219,12 +229,22 @@ export function MockupGenerator() {
                             {o.badge}
                           </Badge>
                         )}
+                        {o.cost && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                            {o.cost}
+                          </Badge>
+                        )}
                         {o.disabled && <Lock className="h-3 w-3 text-muted-foreground" />}
                       </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {MODEL_COST_HINT[model] && (
+                <span className="text-[11px] text-muted-foreground">
+                  {MODEL_COST_HINT[model]}
+                </span>
+              )}
             </div>
           </div>
 
