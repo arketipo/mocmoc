@@ -136,10 +136,10 @@ export const Route = createFileRoute("/api/fuse")({
 
         let upstream: Response;
         try {
-          upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+          upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${key}`,
+              "Lovable-API-Key": key,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
