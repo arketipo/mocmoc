@@ -39,7 +39,7 @@ function Index() {
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
-              <Upload className="h-3.5 w-3.5 text-primary" /> Sube 2 fotos
+              <Upload className="h-3.5 w-3.5 text-primary" /> Sube tus imágenes
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Wand2 className="h-3.5 w-3.5 text-primary" /> La IA fusiona
