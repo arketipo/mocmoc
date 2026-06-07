@@ -8,9 +8,15 @@ interface FuseBody {
   lighting?: string;
   format?: string;
   camera?: string;
+  model?: string;
   seed?: number;
   referenceImage?: string; // previous render, used to lock consistency
 }
+
+const MODEL_MAP: Record<string, string> = {
+  "nano-banana-2": "google/gemini-3.1-flash-image-preview",
+  "gpt-image-2": "openai/gpt-image-2",
+};
 
 function isDataUrl(value: unknown): value is string {
   return typeof value === "string" && value.startsWith("data:image/") && value.length < 15_000_000;
