@@ -187,6 +187,15 @@ export function MockupGenerator() {
     <div className="grid gap-8 lg:grid-cols-2">
       {/* Inputs */}
       <div className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+        <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-3 py-2.5">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-foreground">Modo demo</span>
+            <span className="text-xs text-muted-foreground">
+              Muestra un ejemplo prediseñado sin gastar créditos de IA.
+            </span>
+          </div>
+          <Switch checked={demoMode} onCheckedChange={setDemoMode} aria-label="Modo demo" />
+        </div>
         <div className="grid grid-cols-3 gap-3">
           <ImageDropzone
             label="Producto"
