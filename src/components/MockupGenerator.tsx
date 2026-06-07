@@ -24,6 +24,7 @@ import {
 import { fileToDataUrl } from "@/lib/image-utils";
 import demoMockup from "@/assets/demo-mockup.png.asset.json";
 import demoLabel from "@/assets/demo-label.png.asset.json";
+import demoProduct from "@/assets/demo-product.png.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
@@ -201,7 +202,7 @@ export function MockupGenerator() {
           <ImageDropzone
             label="Producto"
             hint="base"
-            value={product?.preview ?? null}
+            value={product?.preview ?? (demoMode ? demoProduct.url : null)}
             onChange={(preview, file) =>
               setProduct(preview && file ? { preview, file } : null)
             }
