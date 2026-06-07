@@ -337,7 +337,9 @@ export function MockupGenerator() {
           )}
         </Button>
         <p className="-mt-2 text-center text-xs text-muted-foreground">
-          Arrastra el producto y la etiqueta para empezar.
+          {demoMode
+            ? "Modo demo activo — se mostrará un ejemplo prediseñado."
+            : "Arrastra el producto y la etiqueta para empezar."}
         </p>
 
         {error && (
