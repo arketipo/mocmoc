@@ -63,6 +63,13 @@ export const Route = createFileRoute("/api/fuse")({
 
         const hasBackground = isDataUrl(body.backgroundImage);
         const userPrompt = (body.prompt ?? "").toString().slice(0, 600).trim();
+        const lighting = LIGHTING_MAP[body.lighting ?? ""] ?? "";
+        const format = FORMAT_MAP[body.format ?? ""] ?? "";
+        const camera = CAMERA_MAP[body.camera ?? ""] ?? "";
+        const seed =
+          typeof body.seed === "number" && Number.isFinite(body.seed)
+            ? Math.floor(body.seed)
+            : undefined;
 
         const instruction = [
           "You are a professional product mockup generator.",
@@ -74,6 +81,12 @@ export const Route = createFileRoute("/api/fuse")({
           hasBackground
             ? "Place the finished product into the provided background scene, matching its lighting and perspective."
             : "Keep the product shape and background clean and photorealistic.",
+          format ? `Render ${format}.` : "",
+          camera ? `Use ${camera}.` : "",
+          lighting ? `Use ${lighting}.` : "",
+          seed !== undefined
+            ? `Keep a consistent look and composition across renders (consistency seed ${seed}).`
+            : "",
           "Output only the final image.",
           userPrompt ? `Additional creative direction: ${userPrompt}` : "",
         ]
