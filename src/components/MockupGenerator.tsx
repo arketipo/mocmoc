@@ -38,6 +38,11 @@ const FORMAT_OPTIONS = [
   { value: "9:16", label: "9:16 story" },
 ] as const;
 
+const MODEL_OPTIONS = [
+  { value: "nano-banana-2", label: "Nano Banana 2" },
+  { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
+] as const;
+
 const CAMERA_OPTIONS = [
   { value: "front", label: "Frontal" },
   { value: "three-quarter", label: "Ángulo 3/4" },
