@@ -155,6 +155,11 @@ export function MockupGenerator() {
       });
       const data = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !data.image) {
+        if (res.status === 402) {
+          throw new Error(
+            "Se agotaron los créditos de IA. Añade saldo en Settings → Cloud & AI balance o prueba con Nano Banana 2 (más económico)."
+          );
+        }
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
