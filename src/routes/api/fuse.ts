@@ -59,7 +59,8 @@ export const Route = createFileRoute("/api/fuse")({
     handlers: {
       POST: async ({ request }) => {
         const key = process.env.LOVABLE_API_KEY;
-        if (!key) {
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!key && !geminiKey) {
           return Response.json({ error: "Falta la configuración de IA." }, { status: 500 });
         }
 
