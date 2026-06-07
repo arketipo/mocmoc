@@ -48,6 +48,10 @@ function Index() {
               <ImageIcon className="h-3.5 w-3.5 text-primary" /> Descarga el mockup
             </span>
           </div>
+
+          <p className="text-xs text-muted-foreground">
+            Usando créditos personales de Diego
+          </p>
         </header>
 
         <div className="animate-fade-up" style={{ animationDelay: "0.1s" }}>
