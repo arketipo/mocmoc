@@ -55,7 +55,7 @@ function Index() {
         </div>
 
         <footer className="mt-14 text-center text-xs text-muted-foreground">
-          Hecho con Mokizador · Tus imágenes se procesan solo para generar tu mockup.
+          Hecho con mucho cariño ❤️ por arketipo
         </footer>
       </div>
     </main>
