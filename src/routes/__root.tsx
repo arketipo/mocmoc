@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "mocmoc app" },
+      { name: "description", content: "A tool for making mockups fast and accurate. By Diego Rodríguez (arketipo)" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "mocmoc app" },
+      { property: "og:description", content: "A tool for making mockups fast and accurate. By Diego Rodríguez (arketipo)" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "mocmoc app" },
+      { name: "twitter:description", content: "A tool for making mockups fast and accurate. By Diego Rodríguez (arketipo)" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5b930e4c-f428-4cba-9562-6c50965de4c1/id-preview-5b9346bf--eac4d1f4-609c-4b02-9db3-a53fb2218242.lovable.app-1780853771586.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5b930e4c-f428-4cba-9562-6c50965de4c1/id-preview-5b9346bf--eac4d1f4-609c-4b02-9db3-a53fb2218242.lovable.app-1780853771586.png" },
     ],
     links: [
       {
