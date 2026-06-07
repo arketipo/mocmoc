@@ -5,11 +5,38 @@ interface FuseBody {
   labelImage: string; // data URL
   backgroundImage?: string; // optional data URL
   prompt?: string;
+  lighting?: string;
+  format?: string;
+  camera?: string;
+  seed?: number;
 }
 
 function isDataUrl(value: unknown): value is string {
   return typeof value === "string" && value.startsWith("data:image/") && value.length < 15_000_000;
 }
+
+const LIGHTING_MAP: Record<string, string> = {
+  "soft-studio": "soft, even studio lighting with gentle shadows",
+  natural: "natural daylight with soft realistic shadows",
+  dramatic: "dramatic high-contrast lighting with strong directional shadows",
+  warm: "warm golden-hour lighting",
+  cool: "cool, bluish lighting",
+};
+
+const FORMAT_MAP: Record<string, string> = {
+  "1:1": "a square 1:1 composition",
+  "4:5": "a vertical 4:5 portrait composition",
+  "16:9": "a wide 16:9 horizontal composition",
+  "9:16": "a tall 9:16 vertical story composition",
+};
+
+const CAMERA_MAP: Record<string, string> = {
+  front: "a straight-on frontal camera angle",
+  "three-quarter": "a three-quarter (45°) camera angle",
+  "top-down": "a top-down (overhead) camera angle",
+  macro: "a close-up macro shot emphasizing label detail",
+  wide: "a wide-angle shot showing the full product",
+};
 
 export const Route = createFileRoute("/api/fuse")({
   server: {
