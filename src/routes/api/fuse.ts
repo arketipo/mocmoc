@@ -19,6 +19,14 @@ const MODEL_MAP: Record<string, string> = {
   "gpt-image-2": "openai/gpt-image-2",
 };
 
+// Direct Google Generative Language API model names, used when the user
+// provides their own GEMINI_API_KEY so renders bill to their Google account
+// instead of Lovable AI credits.
+const GEMINI_MODEL_MAP: Record<string, string> = {
+  "nano-banana-2": "gemini-2.5-flash-image",
+  "gemini-3-pro": "gemini-3-pro-image-preview",
+};
+
 function isDataUrl(value: unknown): value is string {
   return typeof value === "string" && value.startsWith("data:image/") && value.length < 15_000_000;
 }
