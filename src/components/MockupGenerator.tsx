@@ -40,6 +40,7 @@ const FORMAT_OPTIONS = [
 
 const MODEL_OPTIONS = [
   { value: "nano-banana-2", label: "Nano Banana 2" },
+  { value: "gemini-3-pro", label: "Gemini 3 Pro" },
   { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
 ];
 
