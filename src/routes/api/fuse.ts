@@ -149,7 +149,7 @@ export const Route = createFileRoute("/api/fuse")({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-3.1-flash-image-preview",
+              model: MODEL_MAP[body.model ?? ""] ?? "google/gemini-3.1-flash-image-preview",
               messages: [{ role: "user", content }],
               modalities: ["image", "text"],
             }),
