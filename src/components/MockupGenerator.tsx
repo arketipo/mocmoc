@@ -194,6 +194,17 @@ export function MockupGenerator() {
             Ajustes avanzados
           </span>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              icon={Sparkles}
+              label="Modelo de IA"
+              placeholder="Elige modelo"
+              value={model}
+              onChange={setModel}
+              options={MODEL_OPTIONS.filter((o) => !o.disabled) as unknown as typeof LIGHTING_OPTIONS}
+            />
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-3">
             <SelectField
               icon={Sun}
