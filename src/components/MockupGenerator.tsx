@@ -4,10 +4,12 @@ import {
   Download,
   Frame,
   Loader2,
+  Lock,
   Sparkles,
   Sun,
   Wand2,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { ImageDropzone } from "@/components/ImageDropzone";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +37,11 @@ const FORMAT_OPTIONS = [
   { value: "16:9", label: "16:9 horizontal" },
   { value: "9:16", label: "9:16 story" },
 ] as const;
+
+const MODEL_OPTIONS = [
+  { value: "nano-banana-2", label: "Nano Banana 2" },
+  { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
+];
 
 const CAMERA_OPTIONS = [
   { value: "front", label: "Frontal" },
@@ -89,6 +96,7 @@ export function MockupGenerator() {
   const [lighting, setLighting] = useState("");
   const [format, setFormat] = useState("");
   const [camera, setCamera] = useState("");
+  const [model, setModel] = useState("nano-banana-2");
   const [seedOn, setSeedOn] = useState(false);
   const [seed, setSeed] = useState<number | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -134,6 +142,7 @@ export function MockupGenerator() {
           lighting,
           format,
           camera,
+          model,
           seed: seedOn ? seed : undefined,
           referenceImage: referenceImage ?? undefined,
         }),
@@ -184,6 +193,39 @@ export function MockupGenerator() {
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Ajustes avanzados
           </span>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Modelo de IA
+              </span>
+              <Select value={model} onValueChange={setModel}>
+                <SelectTrigger className="h-9 rounded-lg">
+                  <SelectValue placeholder="Elige modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MODEL_OPTIONS.map((o) => (
+                    <SelectItem
+                      key={o.value}
+                      value={o.value}
+                      disabled={o.disabled}
+                      className={o.disabled ? "opacity-50" : ""}
+                    >
+                      <span className="flex items-center gap-2">
+                        {o.label}
+                        {o.badge && (
+                          <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4">
+                            {o.badge}
+                          </Badge>
+                        )}
+                        {o.disabled && <Lock className="h-3 w-3 text-muted-foreground" />}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
             <SelectField
