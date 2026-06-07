@@ -4,10 +4,12 @@ import {
   Download,
   Frame,
   Loader2,
+  Lock,
   Sparkles,
   Sun,
   Wand2,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { ImageDropzone } from "@/components/ImageDropzone";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
