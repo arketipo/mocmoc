@@ -9,6 +9,7 @@ interface FuseBody {
   format?: string;
   camera?: string;
   seed?: number;
+  referenceImage?: string; // previous render, used to lock consistency
 }
 
 function isDataUrl(value: unknown): value is string {
