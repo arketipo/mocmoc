@@ -224,12 +224,22 @@ export function MockupGenerator() {
                             {o.badge}
                           </Badge>
                         )}
+                        {o.cost && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                            {o.cost}
+                          </Badge>
+                        )}
                         {o.disabled && <Lock className="h-3 w-3 text-muted-foreground" />}
                       </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {MODEL_COST_HINT[model] && (
+                <span className="text-[11px] text-muted-foreground">
+                  {MODEL_COST_HINT[model]}
+                </span>
+              )}
             </div>
           </div>
 
