@@ -25,6 +25,7 @@ import { fileToDataUrl } from "@/lib/image-utils";
 import demoMockup from "@/assets/demo-mockup.png.asset.json";
 import demoLabel from "@/assets/demo-label.png.asset.json";
 import demoProduct from "@/assets/demo-product.png.asset.json";
+import demoBackground from "@/assets/demo-background.jpg.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
@@ -216,7 +217,7 @@ export function MockupGenerator() {
           <ImageDropzone
             label="Fondo"
             hint="opcional"
-            value={background?.preview ?? null}
+            value={background?.preview ?? (demoMode ? demoBackground.url : null)}
             onChange={(preview, file) =>
               setBackground(preview && file ? { preview, file } : null)
             }
