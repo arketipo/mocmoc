@@ -19,6 +19,14 @@ const MODEL_MAP: Record<string, string> = {
   "gpt-image-2": "openai/gpt-image-2",
 };
 
+// Direct Google Generative Language API model names, used when the user
+// provides their own GEMINI_API_KEY so renders bill to their Google account
+// instead of Lovable AI credits.
+const GEMINI_MODEL_MAP: Record<string, string> = {
+  "nano-banana-2": "gemini-2.5-flash-image",
+  "gemini-3-pro": "gemini-3-pro-image-preview",
+};
+
 function isDataUrl(value: unknown): value is string {
   return typeof value === "string" && value.startsWith("data:image/") && value.length < 15_000_000;
 }
@@ -51,7 +59,8 @@ export const Route = createFileRoute("/api/fuse")({
     handlers: {
       POST: async ({ request }) => {
         const key = process.env.LOVABLE_API_KEY;
-        if (!key) {
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!key && !geminiKey) {
           return Response.json({ error: "Falta la configuración de IA." }, { status: 500 });
         }
 
@@ -141,6 +150,75 @@ export const Route = createFileRoute("/api/fuse")({
           content.push({ type: "image_url", image_url: { url: body.backgroundImage } });
         }
 
+        // Preferred path: use the user's own Google Gemini API key (Nano Banana)
+        // when available, so renders bill to their Google account.
+        const geminiModel = GEMINI_MODEL_MAP[body.model ?? ""];
+        if (geminiKey && geminiModel) {
+          const orderedImages: string[] = [];
+          if (hasReference) orderedImages.push(body.referenceImage as string);
+          orderedImages.push(body.productImage, body.labelImage);
+          if (hasBackground) orderedImages.push(body.backgroundImage as string);
+
+          const parts: Array<Record<string, unknown>> = [{ text: instruction }];
+          for (const dataUrl of orderedImages) {
+            const parsed = parseDataUrl(dataUrl);
+            if (parsed) {
+              parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.base64 } });
+            }
+          }
+
+          let gemini: Response;
+          try {
+            gemini = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`,
+              {
+                method: "POST",
+                headers: {
+                  "x-goog-api-key": geminiKey,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ contents: [{ parts }] }),
+              },
+            );
+          } catch {
+            return Response.json({ error: "No se pudo contactar a Gemini." }, { status: 502 });
+          }
+
+          if (!gemini.ok) {
+            const text = await gemini.text().catch(() => "");
+            if (gemini.status === 429) {
+              return Response.json(
+                { error: "Gemini: límite de solicitudes alcanzado. Espera un momento." },
+                { status: 429 },
+              );
+            }
+            if (gemini.status === 401 || gemini.status === 403) {
+              return Response.json(
+                { error: "Tu API key de Gemini no es válida o no tiene permisos." },
+                { status: 401 },
+              );
+            }
+            return Response.json(
+              { error: "Gemini no pudo generar el mockup.", detail: text.slice(0, 300) },
+              { status: 502 },
+            );
+          }
+
+          const gjson = (await gemini.json().catch(() => null)) as Record<string, unknown> | null;
+          const gb64 = extractGeminiImage(gjson);
+          if (!gb64) {
+            return Response.json(
+              { error: "Gemini no devolvió una imagen. Prueba con otras fotos o un prompt distinto." },
+              { status: 502 },
+            );
+          }
+          return Response.json({ image: `data:image/png;base64,${gb64}` });
+        }
+
+        if (!key) {
+          return Response.json({ error: "Falta la configuración de IA." }, { status: 500 });
+        }
+
         let upstream: Response;
         try {
           upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -198,6 +276,33 @@ export const Route = createFileRoute("/api/fuse")({
 /** Extract a base64 PNG from the various shapes the gateway can return. */
 function extractImage(json: Record<string, unknown> | null): string | null {
   if (!json) return null;
+
+  return extractOpenAiImage(json);
+}
+
+/** Split a data URL into mime type and raw base64 payload. */
+function parseDataUrl(value: string): { mime: string; base64: string } | null {
+  const match = /^data:([^;]+);base64,(.*)$/s.exec(value);
+  if (!match) return null;
+  return { mime: match[1], base64: match[2] };
+}
+
+/** Extract a base64 image from a Google Gemini generateContent response. */
+function extractGeminiImage(json: Record<string, unknown> | null): string | null {
+  if (!json) return null;
+  const candidates = json.candidates as
+    | Array<{ content?: { parts?: Array<{ inlineData?: { data?: string }; inline_data?: { data?: string } }> } }>
+    | undefined;
+  const parts = candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return null;
+  for (const part of parts) {
+    const data = part.inlineData?.data ?? part.inline_data?.data;
+    if (typeof data === "string" && data.length > 0) return stripPrefix(data);
+  }
+  return null;
+}
+
+function extractOpenAiImage(json: Record<string, unknown>): string | null {
 
   // OpenAI images shape: { data: [{ b64_json }] }
   const data = json.data as Array<{ b64_json?: string }> | undefined;
