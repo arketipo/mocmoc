@@ -15,6 +15,7 @@ interface FuseBody {
 
 const MODEL_MAP: Record<string, string> = {
   "nano-banana-2": "google/gemini-3.1-flash-image-preview",
+  "gemini-3-pro": "google/gemini-3-pro-image-preview",
   "gpt-image-2": "openai/gpt-image-2",
 };
 
