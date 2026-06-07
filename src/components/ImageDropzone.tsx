@@ -29,9 +29,9 @@ export function ImageDropzone({ label, hint, value, onChange }: ImageDropzonePro
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between">
-        <span className="text-sm font-semibold text-foreground">{label}</span>
-        <span className="text-xs text-muted-foreground">{hint}</span>
+      <div className="flex items-baseline justify-between gap-1">
+        <span className="text-xs font-semibold text-foreground">{label}</span>
+        <span className="text-[10px] text-muted-foreground">{hint}</span>
       </div>
 
       <div
@@ -43,7 +43,7 @@ export function ImageDropzone({ label, hint, value, onChange }: ImageDropzonePro
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "group relative flex aspect-[4/3] cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed bg-card transition-all",
+          "group relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed bg-card transition-all",
           dragging
             ? "border-primary bg-accent shadow-elegant"
             : "border-border hover:border-primary/60 hover:bg-accent/40",
@@ -58,19 +58,21 @@ export function ImageDropzone({ label, hint, value, onChange }: ImageDropzonePro
                 e.stopPropagation();
                 onChange(null, null);
               }}
-              className="absolute right-3 top-3 rounded-full bg-foreground/80 p-1.5 text-background backdrop-blur transition-colors hover:bg-foreground"
+              className="absolute right-2 top-2 rounded-full bg-foreground/80 p-1 text-background backdrop-blur transition-colors hover:bg-foreground"
               aria-label="Quitar imagen"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </>
         ) : (
-          <div className="flex flex-col items-center gap-2 px-6 text-center">
-            <span className="rounded-full bg-accent p-3 text-primary transition-transform group-hover:scale-110">
-              <ImagePlus className="h-6 w-6" />
+          <div className="flex flex-col items-center gap-1.5 px-2 text-center">
+            <span className="rounded-full bg-accent p-2 text-primary transition-transform group-hover:scale-110">
+              <ImagePlus className="h-4 w-4" />
             </span>
-            <span className="text-sm font-medium text-foreground">Arrastra o haz clic</span>
-            <span className="text-xs text-muted-foreground">PNG o JPG</span>
+            <span className="text-[11px] font-medium leading-tight text-foreground">
+              Arrastra aquí
+            </span>
+            <span className="text-[10px] text-muted-foreground">PNG o JPG</span>
           </div>
         )}
       </div>
