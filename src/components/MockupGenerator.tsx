@@ -142,6 +142,7 @@ export function MockupGenerator() {
           lighting,
           format,
           camera,
+          model,
           seed: seedOn ? seed : undefined,
           referenceImage: referenceImage ?? undefined,
         }),
