@@ -41,7 +41,7 @@ const FORMAT_OPTIONS = [
 const MODEL_OPTIONS = [
   { value: "nano-banana-2", label: "Nano Banana 2" },
   { value: "gpt-image-2", label: "GPT Image 2", disabled: true, badge: "Pro" },
-] as const;
+];
 
 const CAMERA_OPTIONS = [
   { value: "front", label: "Frontal" },
