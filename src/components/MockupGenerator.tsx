@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { fileToDataUrl } from "@/lib/image-utils";
 import demoMockup from "@/assets/demo-mockup.png.asset.json";
+import demoLabel from "@/assets/demo-label.png.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
@@ -208,7 +209,7 @@ export function MockupGenerator() {
           <ImageDropzone
             label="Etiqueta"
             hint="diseño"
-            value={label?.preview ?? null}
+            value={label?.preview ?? (demoMode ? demoLabel.url : null)}
             onChange={(preview, file) => setLabel(preview && file ? { preview, file } : null)}
           />
           <ImageDropzone
