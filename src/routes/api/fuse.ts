@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 interface FuseBody {
   productImage: string; // data URL
   labelImage: string; // data URL
+  backgroundImage?: string; // optional data URL
   prompt?: string;
 }
 
@@ -33,18 +34,33 @@ export const Route = createFileRoute("/api/fuse")({
           );
         }
 
+        const hasBackground = isDataUrl(body.backgroundImage);
         const userPrompt = (body.prompt ?? "").toString().slice(0, 600).trim();
 
         const instruction = [
           "You are a professional product mockup generator.",
-          "The FIRST image is a product. The SECOND image is a label/design artwork.",
+          hasBackground
+            ? "The FIRST image is a product, the SECOND image is a label/design artwork, the THIRD image is a background scene."
+            : "The FIRST image is a product. The SECOND image is a label/design artwork.",
           "Apply the label realistically onto the product surface, following its curvature,",
           "perspective, lighting and shadows so it looks like a real photograph of the finished product.",
-          "Keep the product shape and background clean and photorealistic. Output only the final image.",
+          hasBackground
+            ? "Place the finished product into the provided background scene, matching its lighting and perspective."
+            : "Keep the product shape and background clean and photorealistic.",
+          "Output only the final image.",
           userPrompt ? `Additional creative direction: ${userPrompt}` : "",
         ]
           .filter(Boolean)
           .join(" ");
+
+        const content: Array<Record<string, unknown>> = [
+          { type: "text", text: instruction },
+          { type: "image_url", image_url: { url: body.productImage } },
+          { type: "image_url", image_url: { url: body.labelImage } },
+        ];
+        if (hasBackground) {
+          content.push({ type: "image_url", image_url: { url: body.backgroundImage } });
+        }
 
         let upstream: Response;
         try {
@@ -56,16 +72,7 @@ export const Route = createFileRoute("/api/fuse")({
             },
             body: JSON.stringify({
               model: "google/gemini-3.1-flash-image-preview",
-              messages: [
-                {
-                  role: "user",
-                  content: [
-                    { type: "text", text: instruction },
-                    { type: "image_url", image_url: { url: body.productImage } },
-                    { type: "image_url", image_url: { url: body.labelImage } },
-                  ],
-                },
-              ],
+              messages: [{ role: "user", content }],
               modalities: ["image", "text"],
             }),
           });
