@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { fileToDataUrl } from "@/lib/image-utils";
 import demoMockup from "@/assets/demo-mockup.png.asset.json";
+import demoLabel from "@/assets/demo-label.png.asset.json";
 
 const LIGHTING_OPTIONS = [
   { value: "soft-studio", label: "Estudio suave" },
