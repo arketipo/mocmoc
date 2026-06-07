@@ -277,6 +277,33 @@ export const Route = createFileRoute("/api/fuse")({
 function extractImage(json: Record<string, unknown> | null): string | null {
   if (!json) return null;
 
+  return extractOpenAiImage(json);
+}
+
+/** Split a data URL into mime type and raw base64 payload. */
+function parseDataUrl(value: string): { mime: string; base64: string } | null {
+  const match = /^data:([^;]+);base64,(.*)$/s.exec(value);
+  if (!match) return null;
+  return { mime: match[1], base64: match[2] };
+}
+
+/** Extract a base64 image from a Google Gemini generateContent response. */
+function extractGeminiImage(json: Record<string, unknown> | null): string | null {
+  if (!json) return null;
+  const candidates = json.candidates as
+    | Array<{ content?: { parts?: Array<{ inlineData?: { data?: string }; inline_data?: { data?: string } }> } }>
+    | undefined;
+  const parts = candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return null;
+  for (const part of parts) {
+    const data = part.inlineData?.data ?? part.inline_data?.data;
+    if (typeof data === "string" && data.length > 0) return stripPrefix(data);
+  }
+  return null;
+}
+
+function extractOpenAiImage(json: Record<string, unknown>): string | null {
+
   // OpenAI images shape: { data: [{ b64_json }] }
   const data = json.data as Array<{ b64_json?: string }> | undefined;
   if (Array.isArray(data) && data[0]?.b64_json) return stripPrefix(data[0].b64_json);
