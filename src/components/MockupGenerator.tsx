@@ -327,7 +327,7 @@ export function MockupGenerator() {
         </div>
 
         {result && (
-          <a href={result} download="mockup-mokizador.png">
+          <a href={result} download={`mockup-${model}.png`}>
             <Button variant="outline" size="lg" className="h-11 w-full rounded-xl">
               <Download className="h-5 w-5" /> Descargar mockup
             </Button>
