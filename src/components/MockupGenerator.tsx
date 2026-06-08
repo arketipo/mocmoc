@@ -324,20 +324,6 @@ export function MockupGenerator() {
           </div>
         </div>
 
-        {!demoMode && (
-          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 px-3 py-2.5">
-            <span className="text-xs font-medium text-muted-foreground">
-              Generaciones de la demo (hoy)
-            </span>
-            <Badge
-              variant={remaining > 0 ? "secondary" : "destructive"}
-              className="text-xs"
-            >
-              {remaining} / {DEMO_DAILY_LIMIT} restantes
-            </Badge>
-          </div>
-        )}
-
         <Button
           size="lg"
           disabled={!canGenerate}
