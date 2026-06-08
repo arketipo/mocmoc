@@ -122,8 +122,26 @@ export function MockupGenerator() {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [used, setUsed] = useState(0);
 
-  const canGenerate = (demoMode || (!!product && !!label)) && !loading;
+  // Carga el contador del día desde el navegador.
+  useEffect(() => {
+    const stored = Number(localStorage.getItem(todayKey()) ?? "0");
+    if (Number.isFinite(stored)) setUsed(stored);
+  }, []);
+
+  const remaining = Math.max(0, DEMO_DAILY_LIMIT - used);
+
+  const canGenerate =
+    (demoMode || (!!product && !!label)) && !loading && (demoMode || remaining > 0);
+
+  function trackGeneration() {
+    setUsed((prev) => {
+      const next = prev + 1;
+      localStorage.setItem(todayKey(), String(next));
+      return next;
+    });
+  }
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
@@ -188,6 +206,7 @@ export function MockupGenerator() {
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
+      trackGeneration();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Algo salió mal.");
     } finally {
