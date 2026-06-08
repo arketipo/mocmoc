@@ -351,6 +351,20 @@ export function MockupGenerator() {
           </div>
         </div>
 
+        {!demoMode && (
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 px-3 py-2.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              Generaciones de la demo (hoy)
+            </span>
+            <Badge
+              variant={remaining > 0 ? "secondary" : "destructive"}
+              className="text-xs"
+            >
+              {remaining} / {DEMO_DAILY_LIMIT} restantes
+            </Badge>
+          </div>
+        )}
+
         <Button
           size="lg"
           disabled={!canGenerate}
@@ -370,7 +384,9 @@ export function MockupGenerator() {
         <p className="-mt-2 text-center text-xs text-muted-foreground">
           {demoMode
             ? "Modo demo activo — se mostrará un ejemplo prediseñado."
-            : "Arrastra el producto y la etiqueta para empezar."}
+            : remaining > 0
+              ? "Arrastra el producto y la etiqueta para empezar."
+              : "Has alcanzado el cupo de generaciones de hoy. Vuelve mañana o aumenta el límite."}
         </p>
 
         {error && (
