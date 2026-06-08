@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DEMO_DAILY_LIMIT, getUsedCount, trackGeneration, todayKey } from "@/lib/demo-counter";
 import {
   Camera,
   Download,
@@ -61,14 +62,6 @@ const CAMERA_OPTIONS = [
   { value: "wide", label: "Gran angular" },
 ] as const;
 
-// Cupo local de generaciones para la demo de hoy. Se reinicia cada día y se
-// guarda en el navegador (no es el saldo real de créditos de Lovable, que no
-// se puede consultar desde la app).
-const DEMO_DAILY_LIMIT = 25;
-
-function todayKey() {
-  return `mokizador-gens-${new Date().toISOString().slice(0, 10)}`;
-}
 
 /** Active select-style field tied to the API request. */
 function SelectField({
@@ -126,22 +119,13 @@ export function MockupGenerator() {
 
   // Carga el contador del día desde el navegador.
   useEffect(() => {
-    const stored = Number(localStorage.getItem(todayKey()) ?? "0");
-    if (Number.isFinite(stored)) setUsed(stored);
+    setUsed(getUsedCount());
   }, []);
 
   const remaining = Math.max(0, DEMO_DAILY_LIMIT - used);
 
   const canGenerate =
     (demoMode || (!!product && !!label)) && !loading && (demoMode || remaining > 0);
-
-  function trackGeneration() {
-    setUsed((prev) => {
-      const next = prev + 1;
-      localStorage.setItem(todayKey(), String(next));
-      return next;
-    });
-  }
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
@@ -206,7 +190,8 @@ export function MockupGenerator() {
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
-      trackGeneration();
+      const next = trackGeneration();
+      setUsed(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Algo salió mal.");
     } finally {
