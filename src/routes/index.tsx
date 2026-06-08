@@ -50,8 +50,7 @@ function Index() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Usando créditos personales de Diego ·{" "}
-            <CreditsCounter />
+            Usando créditos personales de Diego
           </p>
         </header>
 
