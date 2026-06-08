@@ -119,22 +119,13 @@ export function MockupGenerator() {
 
   // Carga el contador del día desde el navegador.
   useEffect(() => {
-    const stored = Number(localStorage.getItem(todayKey()) ?? "0");
-    if (Number.isFinite(stored)) setUsed(stored);
+    setUsed(getUsedCount());
   }, []);
 
   const remaining = Math.max(0, DEMO_DAILY_LIMIT - used);
 
   const canGenerate =
     (demoMode || (!!product && !!label)) && !loading && (demoMode || remaining > 0);
-
-  function trackGeneration() {
-    setUsed((prev) => {
-      const next = prev + 1;
-      localStorage.setItem(todayKey(), String(next));
-      return next;
-    });
-  }
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
