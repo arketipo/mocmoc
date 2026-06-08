@@ -1,24 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { Sparkles, Upload, Wand2, Image as ImageIcon } from "lucide-react";
 import { MockupGenerator } from "@/components/MockupGenerator";
-import { DEMO_DAILY_LIMIT, todayKey } from "@/lib/demo-counter";
-
-function CreditsCounter() {
-  const [used, setUsed] = useState(0);
-
-  useEffect(() => {
-    const stored = Number(localStorage.getItem(todayKey()) ?? "0");
-    setUsed(Number.isFinite(stored) ? stored : 0);
-  }, []);
-
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span className="font-semibold text-foreground">{used}</span>
-      <span className="text-muted-foreground">de {DEMO_DAILY_LIMIT}</span>
-    </span>
-  );
-}
 
 export const Route = createFileRoute("/")({
   head: () => ({
