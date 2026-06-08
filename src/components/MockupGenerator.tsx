@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Camera,
   Download,
@@ -61,6 +61,15 @@ const CAMERA_OPTIONS = [
   { value: "wide", label: "Gran angular" },
 ] as const;
 
+// Cupo local de generaciones para la demo de hoy. Se reinicia cada día y se
+// guarda en el navegador (no es el saldo real de créditos de Lovable, que no
+// se puede consultar desde la app).
+const DEMO_DAILY_LIMIT = 25;
+
+function todayKey() {
+  return `mokizador-gens-${new Date().toISOString().slice(0, 10)}`;
+}
+
 /** Active select-style field tied to the API request. */
 function SelectField({
   icon: Icon,
@@ -113,8 +122,26 @@ export function MockupGenerator() {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [used, setUsed] = useState(0);
 
-  const canGenerate = (demoMode || (!!product && !!label)) && !loading;
+  // Carga el contador del día desde el navegador.
+  useEffect(() => {
+    const stored = Number(localStorage.getItem(todayKey()) ?? "0");
+    if (Number.isFinite(stored)) setUsed(stored);
+  }, []);
+
+  const remaining = Math.max(0, DEMO_DAILY_LIMIT - used);
+
+  const canGenerate =
+    (demoMode || (!!product && !!label)) && !loading && (demoMode || remaining > 0);
+
+  function trackGeneration() {
+    setUsed((prev) => {
+      const next = prev + 1;
+      localStorage.setItem(todayKey(), String(next));
+      return next;
+    });
+  }
 
   function toggleSeed(on: boolean) {
     setSeedOn(on);
@@ -179,6 +206,7 @@ export function MockupGenerator() {
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
+      trackGeneration();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Algo salió mal.");
     } finally {
@@ -323,6 +351,20 @@ export function MockupGenerator() {
           </div>
         </div>
 
+        {!demoMode && (
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 px-3 py-2.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              Generaciones de la demo (hoy)
+            </span>
+            <Badge
+              variant={remaining > 0 ? "secondary" : "destructive"}
+              className="text-xs"
+            >
+              {remaining} / {DEMO_DAILY_LIMIT} restantes
+            </Badge>
+          </div>
+        )}
+
         <Button
           size="lg"
           disabled={!canGenerate}
@@ -342,7 +384,9 @@ export function MockupGenerator() {
         <p className="-mt-2 text-center text-xs text-muted-foreground">
           {demoMode
             ? "Modo demo activo — se mostrará un ejemplo prediseñado."
-            : "Arrastra el producto y la etiqueta para empezar."}
+            : remaining > 0
+              ? "Arrastra el producto y la etiqueta para empezar."
+              : "Has alcanzado el cupo de generaciones de hoy. Vuelve mañana o aumenta el límite."}
         </p>
 
         {error && (
