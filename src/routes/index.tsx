@@ -52,7 +52,8 @@ function Index() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Usando créditos personales de Diego
+            Usando créditos personales de Diego ·{" "}
+            <CreditsCounter />
           </p>
         </header>
 
