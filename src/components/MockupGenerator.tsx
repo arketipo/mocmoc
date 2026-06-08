@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { DEMO_DAILY_LIMIT, getUsedCount, trackGeneration, todayKey } from "@/lib/demo-counter";
 import {
   Camera,
   Download,
