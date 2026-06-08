@@ -190,7 +190,8 @@ export function MockupGenerator() {
         throw new Error(data.error ?? "No se pudo generar el mockup.");
       }
       setResult(data.image);
-      trackGeneration();
+      const next = trackGeneration();
+      setUsed(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Algo salió mal.");
     } finally {
