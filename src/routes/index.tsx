@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Sparkles, Upload, Wand2, Image as ImageIcon } from "lucide-react";
 import { MockupGenerator } from "@/components/MockupGenerator";
+import { DEMO_DAILY_LIMIT, todayKey } from "@/lib/demo-counter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
