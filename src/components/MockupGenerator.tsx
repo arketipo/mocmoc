@@ -343,9 +343,7 @@ export function MockupGenerator() {
         <p className="-mt-2 text-center text-xs text-muted-foreground">
           {demoMode
             ? "Modo demo activo — se mostrará un ejemplo prediseñado."
-            : remaining > 0
-              ? "Arrastra el producto y la etiqueta para empezar."
-              : "Has alcanzado el cupo de generaciones de hoy. Vuelve mañana o aumenta el límite."}
+            : "Arrastra el producto y la etiqueta para empezar."}
         </p>
 
         {error && (
