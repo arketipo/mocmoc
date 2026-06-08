@@ -62,14 +62,6 @@ const CAMERA_OPTIONS = [
   { value: "wide", label: "Gran angular" },
 ] as const;
 
-// Cupo local de generaciones para la demo de hoy. Se reinicia cada día y se
-// guarda en el navegador (no es el saldo real de créditos de Lovable, que no
-// se puede consultar desde la app).
-const DEMO_DAILY_LIMIT = 25;
-
-function todayKey() {
-  return `mokizador-gens-${new Date().toISOString().slice(0, 10)}`;
-}
 
 /** Active select-style field tied to the API request. */
 function SelectField({
